@@ -1,3 +1,0 @@
-15% scale
-10x10 sprite sheet
-website: https://cards.vladde.me

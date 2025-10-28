@@ -17,6 +17,7 @@
 
 //NEED TO ADD FELAPSETIME ;)
 
+HMODULE _GDhInstance = NULL;
 HWND _GDconsoleWinHandle = NULL; //gets the window handle to the console controlled by this program
 HANDLE _GDconsoleOutputHandle = NULL; //the handle to output to edit the cursor
 HDC _GDconsoleDeviceContext = NULL; //get the device contect to draw on
@@ -64,6 +65,40 @@ int _GDstrLen(const char* string) {
 	return i;
 }
 
+
+int _GDcreateWindow(){
+	_GDhInstance = GetModuleHandle(NULL);
+	const wchar_t winClassName[] = L"_GDGameWindow";
+	
+	WNDCLASS wc = {};
+	wc.lpfnWndProc = NULL;
+	wc.hInstance = _GDhInstance;
+	wc.lpszClassName = winClassName;
+	wc.style = CS_OWNDC;
+	
+	RegisterClass(&wc);
+	
+	_GDconsoleWinHandle = CreateWindowEx(
+		0,                              // Optional window styles.
+		winClassName,                     // Window class
+		L"Learn to Program Windows",    // Window text
+		WS_OVERLAPPEDWINDOW,            // Window style
+
+		// Size and position
+		CW_USEDEFAULT, CW_USEDEFAULT, _GDrawWidth, _GDrawHeight,
+
+		NULL,       // Parent window    
+		NULL,       // Menu
+		_GDhInstance,  // Instance handle
+		NULL        // Additional application data
+		);
+
+	ShowWindow(_GDconsoleWinHandle, SW_SHOW);
+	_GDconsoleDeviceContext = GetDC(_GDconsoleWinHandle); //get console device contect handle (for drawing)
+
+}
+
+
 /*
 returns false(0) if successfull, return true(1) if fails
 title needs to be less than 63998 to be less than 64000 characters long and accomodate for terminating('\0') value
@@ -87,21 +122,19 @@ int GDinit(int width, int height, int pixelWidth, int pixelHeight, char* title) 
 	_GDpixelWidth = pixelWidth;
 	_GDpixelHeight = pixelHeight;
 
+	//create dediceated window for graphics
+	_GDhInstance = GetModuleHandle(NULL);
+	
 	//create extra buffer for displaying and tings
-	_GDconsoleWinHandle = GetConsoleWindow(); //get the console window handle (for getting the device context)
-	_GDconsoleOutputHandle = GetStdHandle(STD_OUTPUT_HANDLE); //get console output handle (seeting output features like hiding cursor)
-	_GDconsoleDeviceContext = GetWindowDC(_GDconsoleWinHandle); //get console device contect handle (for drawing)
-
+	_GDcreateWindow();
+	
+	
 	//creates double buffer (need to delete these as i created them, they're not from the console it self )
 	_GDbackBufferDeviceContext = CreateCompatibleDC(_GDconsoleDeviceContext);
 	_GDbackBufferBitMap = CreateCompatibleBitmap(_GDconsoleDeviceContext, _GDrawWidth, _GDrawHeight);
 	SelectObject(_GDbackBufferDeviceContext, _GDbackBufferBitMap); //links the bitmap to the dc to draw on it
 
 	//lock widnow from drawing ----------- test
-
-	//sets the curosor to the width of one and hids it
-	CONSOLE_CURSOR_INFO newCursor = { 1, FALSE };
-	SetConsoleCursorInfo(_GDconsoleOutputHandle, &newCursor);
 
 	_GDpixelSetType = GetDeviceCaps(_GDbackBufferDeviceContext, RC_BITBLT);
 
@@ -220,6 +253,7 @@ int GDdrawBackBuffer() {
 int GDdeInit() {
 	DeleteObject(_GDbackBufferBitMap);
 	DeleteDC(_GDbackBufferDeviceContext);
+	ReleaseDC(_GDconsoleWinHandle, _GDconsoleDeviceContext);
 	FreeLibrary(__SMimg32DLL);
 	return 0;
 }
