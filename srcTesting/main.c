@@ -2,13 +2,19 @@
 
 int main(){
 	
-	GDinit(200, 200, 2, 2, "thing");
+	GDinit(200, 200, 4, 4, "thing");
 	GDclear(RGB(83,195,189));
 	
-	while(1){
-		GDdrawPixel(rand()%200, rand()%200, RGB(rand()%255,rand()%255,rand()%255));
+	
+	while(_GDwindowOpen){
+		if(GDisKeyPressed('A')){
+			GDclear(RGB(0,0,0));
+			//printf("a");
+		}else{
+			GDclear(RGB(83,195,189));
+		}
 		GDdrawBackBuffer();
 	}
-	
+	GDdeInit();
 	return 0;
 }

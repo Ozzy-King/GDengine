@@ -19,6 +19,11 @@
 
 HMODULE _GDhInstance = NULL;
 HWND _GDconsoleWinHandle = NULL; //gets the window handle to the console controlled by this program
+
+HANDLE _GDwindowThread = NULL;
+DWORD _GDwindowThreadId;
+int _GDwindowOpen = 0;
+
 HANDLE _GDconsoleOutputHandle = NULL; //the handle to output to edit the cursor
 HDC _GDconsoleDeviceContext = NULL; //get the device contect to draw on
 
@@ -35,6 +40,10 @@ RECT _GDpixelScreenSize = {0}; //user defined pixel screen size
 int _GDwidth = 0, _GDheight = 0;
 
 int _GDpixelWidth = 0, _GDpixelHeight = 0;
+
+///I ADDED THISSS CHEKC IT TODO todo
+
+///I ADDED THISSS CHEKC IT TODO todo
 
 //this is soem messed up stuff about to happen
 typedef BOOL(__stdcall* TransParentBitBlt)(
@@ -65,9 +74,11 @@ int _GDstrLen(const char* string) {
 	return i;
 }
 
+//used by the window to handle incoming messages
 LRESULT CALLBACK _GDwndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
         case WM_DESTROY:
+			_GDwindowOpen = 0;
             PostQuitMessage(0);
             return 0;
         default:
@@ -75,7 +86,8 @@ LRESULT CALLBACK _GDwndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     }
 }
 
-int _GDcreateWindow(){
+//ran in thead so the seperate thread owns the created window and is 
+DWORD WINAPI _GDcreateWindow(LPVOID lpParam){
 	_GDhInstance = GetModuleHandle(NULL);
 	const wchar_t winClassName[] = L"_GDGameWindow";
 	printf("got hinstance\n");
@@ -89,6 +101,12 @@ int _GDcreateWindow(){
 	RegisterClassW(&wc);
 	printf("registered window class\n");
 	
+	RECT _GDfullWindowSize = {0}; //size of entire window
+	_GDfullWindowSize.left = _GDfullWindowSize.top = 0;
+	_GDfullWindowSize.right = _GDrawWidth;
+	_GDfullWindowSize.bottom = _GDrawHeight;
+	AdjustWindowRectEx(&_GDfullWindowSize,WS_OVERLAPPEDWINDOW,FALSE,0);
+	
 	_GDconsoleWinHandle = CreateWindowExW(
 		0,                              // Optional window styles.
 		winClassName,                     // Window class
@@ -96,7 +114,8 @@ int _GDcreateWindow(){
 		WS_OVERLAPPEDWINDOW,            // Window style
 
 		// Size and position
-		CW_USEDEFAULT, CW_USEDEFAULT, _GDrawWidth, _GDrawHeight,
+		CW_USEDEFAULT, CW_USEDEFAULT, 
+		_GDfullWindowSize.right - _GDfullWindowSize.left, _GDfullWindowSize.bottom - _GDfullWindowSize.top,
 
 		NULL,       // Parent window    
 		NULL,       // Menu
@@ -108,6 +127,17 @@ int _GDcreateWindow(){
 	ShowWindow(_GDconsoleWinHandle, SW_SHOW);
 	_GDconsoleDeviceContext = GetDC(_GDconsoleWinHandle); //get console device contect handle (for drawing)
 	printf("window showed\n");
+	
+	_GDwindowOpen = 1;
+	//message loop for the newly created window
+	MSG msg = { };
+	while (GetMessage(&msg, NULL, 0, 0) > 0)
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	
+	return 0;
 }
 
 
@@ -138,7 +168,12 @@ int GDinit(int width, int height, int pixelWidth, int pixelHeight, char* title) 
 	//create dediceated window for graphics
 	
 	//create extra buffer for displaying and tings
-	_GDcreateWindow();
+	_GDwindowThread = CreateThread(NULL, 0, _GDcreateWindow, NULL, 0, &_GDwindowThreadId);
+	while(_GDwindowOpen == 0){
+		printf("waiting\n");
+	}
+	
+	//_GDcreateWindow();
 	printf("created window\n");
 	
 	//creates double buffer (need to delete these as i created them, they're not from the console it self )
@@ -265,9 +300,15 @@ int GDdrawBackBuffer() {
 }
 
 int GDdeInit() {
+	SendMessage(_GDconsoleWinHandle, WM_QUIT, 0, 0);
+	WaitForSingleObject(_GDwindowThread, INFINITE);
+    CloseHandle(_GDwindowThread);
+	printf("closed thread");
+	
 	DeleteObject(_GDbackBufferBitMap);
 	DeleteDC(_GDbackBufferDeviceContext);
 	ReleaseDC(_GDconsoleWinHandle, _GDconsoleDeviceContext);
 	FreeLibrary(__SMimg32DLL);
+	printf("freed extra resources");
 	return 0;
 }

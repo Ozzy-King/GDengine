@@ -24,6 +24,11 @@ extern "C" {
 
 	extern HMODULE _GDhInstance;
 	extern HWND _GDconsoleWinHandle; //gets the window handle to the console controlled by this program
+	
+	extern HANDLE _GDwindowThread;
+	extern DWORD _GDwindowThreadId;
+	extern int _GDwindowOpen;
+	
 	extern HANDLE _GDconsoleOutputHandle; //the handle to output to edit the cursor
 	extern HDC _GDconsoleDeviceContext; //get the device contect to draw on
 
@@ -43,8 +48,14 @@ extern "C" {
 
 
 	//function proto types//
+	
+	#define GDisKeyPressed(key) (GetAsyncKeyState((int)key) & 0x8000)
+	#define GDisKeyReleased(key) (!(GetAsyncKeyState((int)key)	& 0x8000))
+
 
 	int _GDstrLen(const char* string);
+	LRESULT CALLBACK _GDwndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	DWORD WINAPI _GDcreateWindow(LPVOID lpParam);
 	int GDinit(int width, int height, int pixelWidth, int pixelHeight, char* title);
 	//int GDsetTitle(const char* title);
 

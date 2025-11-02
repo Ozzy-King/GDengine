@@ -1,0 +1,3 @@
+C:\Users\LenovoT480s\Documents\CKit\w64devkit\bin\cmake.exe -E rm -f CMakeFiles\MyProgram.dir/objects.a
+C:\Users\LenovoT480s\Documents\CKit\w64devkit\bin\ar.exe qc CMakeFiles\MyProgram.dir/objects.a @CMakeFiles\MyProgram.dir\objects1.rsp
+C:\Users\LenovoT480s\Documents\CKit\w64devkit\bin\cc.exe -O3 -DNDEBUG  -Wl,-Bdynamic  -s -Wl,--whole-archive CMakeFiles\MyProgram.dir/objects.a -Wl,--no-whole-archive -o MyProgram.exe -Wl,--out-implib,libMyProgram.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\MyProgram.dir\linkLibs.rsp
