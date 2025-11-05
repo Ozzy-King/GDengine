@@ -289,9 +289,4 @@ CMakeFiles/MyProgram.dir/GDIEngineSource.c.obj: \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/stralign_s.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/winsvc.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/mcx.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/imm.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/stdio.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/corecrt_stdio_config.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw_off_t.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/swprintf.inl \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/stdio_s.h
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/imm.h

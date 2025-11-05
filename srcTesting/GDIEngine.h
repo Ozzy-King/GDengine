@@ -52,12 +52,9 @@ extern "C" {
 	#define GDisKeyPressed(key) (GetAsyncKeyState((int)key) & 0x8000)
 	#define GDisKeyReleased(key) (!(GetAsyncKeyState((int)key)	& 0x8000))
 
+	int GDinit(int width, int height, int pixelWidth, int pixelHeight, wchar_t* title);
 
-	int _GDstrLen(const char* string);
-	LRESULT CALLBACK _GDwndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	DWORD WINAPI _GDcreateWindow(LPVOID lpParam);
-	int GDinit(int width, int height, int pixelWidth, int pixelHeight, char* title);
-	//int GDsetTitle(const char* title);
+	int GDsetTitle(wchar_t* title);
 
 	/*
 	draws to current backbuffer

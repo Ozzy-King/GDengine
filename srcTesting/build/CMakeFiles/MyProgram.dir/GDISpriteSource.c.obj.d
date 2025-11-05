@@ -1,12 +1,14 @@
 CMakeFiles/MyProgram.dir/GDISpriteSource.c.obj: \
  C:\Users\LenovoT480s\Documents\CMDPixelEngine\srcTesting\GDISpriteSource.c \
  C:\Users\LenovoT480s\Documents\CMDPixelEngine\srcTesting\GDISprite.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/windows.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/wincodec.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/rpc.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw_mac.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw_secapi.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/vadefs.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sdks/_mingw_ddk.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/windows.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sdkddkver.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/excpt.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/crtdefs.h \
@@ -235,8 +237,6 @@ CMakeFiles/MyProgram.dir/GDISpriteSource.c.obj: \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/timeapi.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/joystickapi.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/nb30.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/rpc.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/windows.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/rpcdce.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/rpcdcep.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/rpcnsi.h \
@@ -291,14 +291,8 @@ CMakeFiles/MyProgram.dir/GDISpriteSource.c.obj: \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/winsvc.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/mcx.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/imm.h \
- C:\Users\LenovoT480s\Documents\CMDPixelEngine\srcTesting\GDIEngine.h \
- C:\Users\LenovoT480s\Documents\CMDPixelEngine\srcTesting\stb_image.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/stdio.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/corecrt_stdio_config.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw_off_t.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/swprintf.inl \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/stdio_s.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/math.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/assert.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdint.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/stdint.h
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/ocidl.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/dxgiformat.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/dcommon.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/wincodecsdk.h \
+ C:\Users\LenovoT480s\Documents\CMDPixelEngine\srcTesting\GDIEngine.h

@@ -1,11 +1,12 @@
 #ifndef GDISPRITE__
 #define GDISPRITE__
-#include <Windows.h>
-#include "GDIEngine.h"
-#include "stb_image.h"
+#include <wincodec.h>    // WIC
+#include <wincodecsdk.h>
 
-#define GDSPimg_BMP 0
-#define GDSPimg_JPG 1
+#include <windows.h>     // HBITMAP, etc.
+#include <objbase.h>    // _com_error for HRESULT handling
+#include "GDIEngine.h"
+
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
@@ -43,10 +44,10 @@ extern "C" {
 		int _numberOfTiles;
 	};
 
-	
-	HBITMAP GDSPloadImage(char* fileName, int imgWidth, int imgHeight);
+	int GDSPinit();
+	int GDSPdeinit();
 	//GDI SPRITE creation function (each sprite tile must be same width and height)
-	struct GDSPsprite GDSPcreateSprite(char* fileName, int imgWidth, int imgHeight, int tileWidth, int tileHeight, int transparent , COLORREF transparentColour);
+	struct GDSPsprite GDSPcreateSprite(wchar_t* fileName, UINT imgWidth, UINT imgHeight, UINT tileWidth, UINT tileHeight, int transparent , COLORREF transparentColour);
 	int GDSPfreeSprite(struct GDSPsprite* sprite);
 
 	int GDSPdrawSprite(int x, int y, int width, int height, struct GDSPsprite* sprite, int tilePos);

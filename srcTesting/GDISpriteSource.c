@@ -1,62 +1,116 @@
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_NO_PNG
-#define STBI_NO_BMP
-#define STBI_NO_PSD
-#define STBI_NO_TGA
-#define STBI_NO_GIF
-#define STBI_NO_HDR
-#define STBI_NO_PIC
-#define STBI_NO_PNM
 #include "GDISprite.h"
 
-HBITMAP GDSPloadImage(char* fileName, int imgWidth, int imgHeight) {
-	int width, height, channels;
-	unsigned char* data = stbi_load(fileName, &width, &height, &channels, STBI_rgb);
+IWICImagingFactory* pFactory = NULL;
+IWICBitmapDecoder* pDecoder = NULL;
+IWICBitmapFrameDecode* pFrame = NULL;
+IWICFormatConverter* pConverter = NULL;
 
-	if (data == NULL) {
-		printf("Failed to load image.\n");
-		return NULL;
-	}
-	int rowSize = width * 3;
-	for (int i = 0; i < width * height; ++i) {
-		unsigned char tmp = data[i * 3];
-		data[i * 3] = data[i * 3 + 2];       // Swap Red and Blue
-		data[i * 3 + 2] = tmp;
-	}
-
-	// Create an HBITMAP from the data
-	HBITMAP hBitmap = NULL;
-	HDC hdc = GetDC(NULL);
-	if (hdc) {
-		BITMAPINFO bmi = { 0 };
-		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-		bmi.bmiHeader.biWidth = MIN(width, imgWidth);
-		bmi.bmiHeader.biHeight = -(MIN(height, imgHeight)); // Negative height for top-down bitmap
-		bmi.bmiHeader.biPlanes = 1;
-		bmi.bmiHeader.biBitCount = 24;  // 24-bit color
-		bmi.bmiHeader.biCompression = BI_RGB;
-
-		// Create the HBITMAP
-		hBitmap = CreateDIBitmap(hdc, &bmi.bmiHeader, CBM_INIT, data, &bmi, DIB_RGB_COLORS);
-		ReleaseDC(NULL, hdc);
-	}
-
-	// Free the image data loaded by stb_image
-	stbi_image_free(data);
-
-	return hBitmap;
+//itilises the WIC factory for image loading
+int GDSPinit(){//add error checking
+    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	if(hr != S_OK){ return 1; }
+	//crate the WIC imageing factory(ued for later operations)
+    hr = CoCreateInstance(
+        &CLSID_WICImagingFactory, 
+		NULL, 
+		CLSCTX_INPROC_SERVER,
+		&IID_IWICImagingFactory,
+        (void**)&pFactory
+    );
+	if(hr != S_OK){ return 1; }
+	return 0;
+}
+int GDSPdeinit(){
+	if (pConverter) pConverter->lpVtbl->Release(pConverter);
+    if (pFrame) pFrame->lpVtbl->Release(pFrame);
+    if (pDecoder) pDecoder->lpVtbl->Release(pDecoder);
+    if (pFactory) pFactory->lpVtbl->Release(pFactory);
+    CoUninitialize();
+	return 0;
 }
 
-struct GDSPsprite GDSPcreateSprite(char* fileName, int imgWidth, int imgHeight, int tileWidth, int tileHeight, int transparent , COLORREF transparentColour) {
+HBITMAP CreateHBITMAPFromWIC(IWICBitmapSource* pBitmapSource)
+{
+    UINT width, height;
+	
+	pBitmapSource->lpVtbl->GetSize(pBitmapSource, &width, &height);
+
+    // Prepare bitmap info
+    BITMAPINFO bminfo = {};
+    bminfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bminfo.bmiHeader.biWidth = width;
+    bminfo.bmiHeader.biHeight = -(LONG)height; // top-down DIB
+    bminfo.bmiHeader.biPlanes = 1;
+    bminfo.bmiHeader.biBitCount = 32;
+    bminfo.bmiHeader.biCompression = BI_RGB;
+
+	void* pvImageBits = NULL;
+
+    HBITMAP hBmp = CreateDIBSection(_GDconsoleDeviceContext, &bminfo, DIB_RGB_COLORS, &pvImageBits, NULL, 0);
+    if (!hBmp) return NULL;
+
+    // Copy pixels from WIC to HBITMAP
+	const UINT stride = width * 4;
+    const UINT imageSize = stride * height;
+    HRESULT hr = pBitmapSource->lpVtbl->CopyPixels(pBitmapSource, NULL, stride, imageSize, (BYTE*)pvImageBits);
+
+    if (FAILED(hr))
+    {
+        DeleteObject(hBmp);
+        return NULL;
+    }
+
+    return hBmp;
+}
+
+//take in the image files name, crates the correct decoders then converts to DISection for further bitblts
+HBITMAP _GDSPloadImage(const wchar_t* filename){
+	HBITMAP newBITMAP = NULL;
+	// Create decoder from file
+    HRESULT hr = pFactory->lpVtbl->CreateDecoderFromFilename(
+        pFactory, filename, NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder
+    );
+    if(hr != S_OK){ goto cleanUpConverters; }
+
+    // Get the first frame (for most image formats)
+    hr = pDecoder->lpVtbl->GetFrame(pDecoder, 0, &pFrame);
+    if(hr != S_OK){ goto cleanUpConverters; }
+
+    // Convert to 32bpp BGRA for HBITMAP
+    hr = pFactory->lpVtbl->CreateFormatConverter(pFactory, &pConverter);
+    if(hr != S_OK){ goto cleanUpConverters; }
+
+    hr = pConverter->lpVtbl->Initialize(//image must be 32bit 8bit for RGBA individually 
+        pConverter,
+		(IWICBitmapSource*)pFrame,
+		&GUID_WICPixelFormat32bppBGRA,
+        WICBitmapDitherTypeNone, NULL, 0.0f, WICBitmapPaletteTypeCustom
+    );
+    if(hr != S_OK){ goto cleanUpConverters; }
+	
+	newBITMAP = CreateHBITMAPFromWIC((IWICBitmapSource*)pConverter);
+
+cleanUpConverters:
+	if (pConverter){ pConverter->lpVtbl->Release(pConverter); pConverter = NULL;}
+	if (pFrame){ pFrame->lpVtbl->Release(pFrame); pFrame = NULL;}
+    if (pDecoder){ pDecoder->lpVtbl->Release(pDecoder); pDecoder = NULL;}
+	
+	return newBITMAP;
+}
+
+
+struct GDSPsprite GDSPcreateSprite(wchar_t* fileName, UINT imgWidth, UINT imgHeight, UINT tileWidth, UINT tileHeight, int transparent , COLORREF transparentColour) {
 	struct GDSPsprite newSprite;
+
+	
 	newSprite._tileWidth = tileWidth;
 	newSprite._tileHeight = tileHeight;
 	newSprite._transparent = transparent;
 	newSprite._transparentColour = transparentColour;
 
 	//gets sprite into the GDSPsprite
-	newSprite._spriteMap = GDSPloadImage(fileName, imgWidth, imgHeight);// (HBITMAP)LoadImage(NULL, ConvertedFilename, IMAGE_BITMAP, imgWidth, imgHeight, LR_LOADFROMFILE);
-
+	newSprite._spriteMap = _GDSPloadImage(fileName);// (HBITMAP)LoadImage(NULL, ConvertedFilename, IMAGE_BITMAP, imgWidth, imgHeight, LR_LOADFROMFILE);
+	
 	//get all the tiles
 	int numberOfTiles = (imgWidth / tileWidth) * (imgHeight / tileHeight);//gets number of tiles (will be used later to index arrays)
 	newSprite._numberOfTiles = numberOfTiles;//saves for later reference

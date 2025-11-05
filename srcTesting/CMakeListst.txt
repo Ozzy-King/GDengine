@@ -1,0 +1,40 @@
+cmake_minimum_required(VERSION 3.23)
+project(TinyWin C)
+
+set(CMAKE_BUILD_TYPE Release)
+
+add_executable(MyProgram
+    main.c
+    GDIEngineSource.c
+    #GDISpriteSource.c
+)
+
+if(MINGW)
+    # Compiler options for size
+    target_compile_options(MyProgram PRIVATE
+        -Os
+        -ffunction-sections
+        -fdata-sections
+        -fomit-frame-pointer
+        -fmerge-all-constants
+        -fno-asynchronous-unwind-tables
+        -fno-unwind-tables
+        -fno-ident
+        -fno-stack-protector
+        -fvisibility=hidden
+    )
+
+    # Linker options for minimal binary
+    target_link_options(MyProgram PRIVATE
+        -Wl,--gc-sections
+        -Wl,--strip-all
+        -Wl,--build-id=none
+        -Wl,--no-insert-timestamp
+    )
+
+    # Optional: fully exclude CRT (only if you provide your own entry point)
+    # target_link_options(MyProgram PRIVATE -nostartfiles -nodefaultlibs)
+endif()
+
+# Link only what you need
+target_link_libraries(MyProgram PRIVATE user32 gdi32 kernel32)

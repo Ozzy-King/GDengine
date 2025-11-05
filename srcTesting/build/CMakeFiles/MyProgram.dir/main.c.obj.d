@@ -289,4 +289,10 @@ CMakeFiles/MyProgram.dir/main.c.obj: \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/stralign_s.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/winsvc.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/mcx.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/imm.h
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/imm.h \
+ C:\Users\LenovoT480s\Documents\CMDPixelEngine\srcTesting\GDISprite.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/wincodec.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/ocidl.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/dxgiformat.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/dcommon.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/wincodecsdk.h
