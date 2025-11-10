@@ -6,7 +6,6 @@ CMakeFiles/MyProgram.dir/GDIEngineSource.c.obj
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_bsd_types.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw_mac.h
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw_off_t.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw_secapi.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw_stdarg.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/_mingw_unicode.h
@@ -25,7 +24,6 @@ CMakeFiles/MyProgram.dir/GDIEngineSource.c.obj
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/consoleapi2.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/consoleapi3.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/corecrt.h
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/corecrt_stdio_config.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/corecrt_wctype.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/corecrt_wstdlib.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/crtdefs.h
@@ -113,7 +111,6 @@ CMakeFiles/MyProgram.dir/GDIEngineSource.c.obj
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sal.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sdkddkver.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sdks/_mingw_ddk.h
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/stdio_s.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/stdlib_s.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/stralign_s.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/string_s.h
@@ -124,12 +121,10 @@ CMakeFiles/MyProgram.dir/GDIEngineSource.c.obj
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/specstrings.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/stdarg.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/stddef.h
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/stdio.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/stdlib.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/stralign.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/string.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/stringapiset.h
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/swprintf.inl
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/synchapi.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sysinfoapi.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/systemtopologyapi.h
@@ -689,6 +684,8 @@ CMakeFiles/MyProgram.dir/main.c.obj
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/pshpack2.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/pshpack4.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/pshpack8.h
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/pthread_compat.h
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/pthread_time.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/realtimeapiset.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/reason.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/rpc.h
@@ -706,6 +703,7 @@ CMakeFiles/MyProgram.dir/main.c.obj
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/stdlib_s.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/stralign_s.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/string_s.h
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/sys/timeb_s.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/securityappcontainer.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/securitybaseapi.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/servprov.h
@@ -718,10 +716,12 @@ CMakeFiles/MyProgram.dir/main.c.obj
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/string.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/stringapiset.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/synchapi.h
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sys/timeb.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sysinfoapi.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/systemtopologyapi.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/threadpoolapiset.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/threadpoollegacyapiset.h
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/time.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/timeapi.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/timezoneapi.h
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/tvout.h

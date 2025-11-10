@@ -295,4 +295,9 @@ CMakeFiles/MyProgram.dir/main.c.obj: \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/ocidl.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/dxgiformat.h \
  C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/dcommon.h \
- C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/wincodecsdk.h
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/wincodecsdk.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/time.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sys/timeb.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/sec_api/sys/timeb_s.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/pthread_time.h \
+ C:/Users/LenovoT480s/Documents/CKit/w64devkit/include/pthread_compat.h

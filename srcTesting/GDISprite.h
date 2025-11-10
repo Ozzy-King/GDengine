@@ -32,6 +32,8 @@ extern "C" {
 
 	//structure to hold the bitmap sprite map
 	struct GDSPsprite {
+		unsigned int _imgWidth;
+		unsigned int _imgHeight;
 		HBITMAP _spriteMap;
 
 		COLORREF _transparentColour;
@@ -47,7 +49,7 @@ extern "C" {
 	int GDSPinit();
 	int GDSPdeinit();
 	//GDI SPRITE creation function (each sprite tile must be same width and height)
-	struct GDSPsprite GDSPcreateSprite(wchar_t* fileName, UINT imgWidth, UINT imgHeight, UINT tileWidth, UINT tileHeight, int transparent , COLORREF transparentColour);
+	struct GDSPsprite GDSPcreateSprite(wchar_t* fileName, UINT tileWidth, UINT tileHeight, int transparent , COLORREF transparentColour);
 	int GDSPfreeSprite(struct GDSPsprite* sprite);
 
 	int GDSPdrawSprite(int x, int y, int width, int height, struct GDSPsprite* sprite, int tilePos);

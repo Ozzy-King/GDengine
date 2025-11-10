@@ -31,7 +31,7 @@ int GDSPdeinit(){
 
 HBITMAP CreateHBITMAPFromWIC(IWICBitmapSource* pBitmapSource)
 {
-    UINT width, height;
+    unsigned int width, height;
 	
 	pBitmapSource->lpVtbl->GetSize(pBitmapSource, &width, &height);
 
@@ -64,7 +64,8 @@ HBITMAP CreateHBITMAPFromWIC(IWICBitmapSource* pBitmapSource)
 }
 
 //take in the image files name, crates the correct decoders then converts to DISection for further bitblts
-HBITMAP _GDSPloadImage(const wchar_t* filename){
+//populates the sprite struct with bitmap, image width and height
+int _GDSPloadImage(const wchar_t* filename, struct GDSPsprite* spriteOut){
 	HBITMAP newBITMAP = NULL;
 	// Create decoder from file
     HRESULT hr = pFactory->lpVtbl->CreateDecoderFromFilename(
@@ -89,27 +90,33 @@ HBITMAP _GDSPloadImage(const wchar_t* filename){
     if(hr != S_OK){ goto cleanUpConverters; }
 	
 	newBITMAP = CreateHBITMAPFromWIC((IWICBitmapSource*)pConverter);
+	
+	//populate sprite with the bitmap and, width and height
+	spriteOut->_spriteMap = newBITMAP;
+	((IWICBitmapSource*)pConverter)->lpVtbl->GetSize(((IWICBitmapSource*)pConverter), &spriteOut->_imgWidth, &spriteOut->_imgHeight);
 
 cleanUpConverters:
 	if (pConverter){ pConverter->lpVtbl->Release(pConverter); pConverter = NULL;}
 	if (pFrame){ pFrame->lpVtbl->Release(pFrame); pFrame = NULL;}
     if (pDecoder){ pDecoder->lpVtbl->Release(pDecoder); pDecoder = NULL;}
 	
-	return newBITMAP;
+	return 0;
 }
 
 
-struct GDSPsprite GDSPcreateSprite(wchar_t* fileName, UINT imgWidth, UINT imgHeight, UINT tileWidth, UINT tileHeight, int transparent , COLORREF transparentColour) {
+struct GDSPsprite GDSPcreateSprite(wchar_t* fileName, UINT tileWidth, UINT tileHeight, int transparent , COLORREF transparentColour) {
 	struct GDSPsprite newSprite;
-
+	unsigned int imgWidth, imgHeight;
+	
+	//gets sprite into the GDSPsprite, with its width and height
+	_GDSPloadImage(fileName, &newSprite);
+	imgWidth = newSprite._imgWidth;
+	imgHeight = newSprite._imgHeight;
 	
 	newSprite._tileWidth = tileWidth;
 	newSprite._tileHeight = tileHeight;
 	newSprite._transparent = transparent;
 	newSprite._transparentColour = transparentColour;
-
-	//gets sprite into the GDSPsprite
-	newSprite._spriteMap = _GDSPloadImage(fileName);// (HBITMAP)LoadImage(NULL, ConvertedFilename, IMAGE_BITMAP, imgWidth, imgHeight, LR_LOADFROMFILE);
 	
 	//get all the tiles
 	int numberOfTiles = (imgWidth / tileWidth) * (imgHeight / tileHeight);//gets number of tiles (will be used later to index arrays)
