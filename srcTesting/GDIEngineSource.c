@@ -13,12 +13,18 @@
 
 #include "GDIEngine.h"
 #include <libloaderapi.h>
-#include <stdio.h>
+//#include <stdio.h>
 
 //NEED TO ADD FELAPSETIME ;)
 
 HMODULE _GDhInstance = NULL;
 HWND _GDconsoleWinHandle = NULL; //gets the window handle to the console controlled by this program
+
+HANDLE _GDwindowThread = NULL;
+DWORD _GDwindowThreadId;
+HANDLE _GDwindowReadyEvent; //used to feecitly wait for window startup
+int _GDwindowOpen = 0;
+
 HANDLE _GDconsoleOutputHandle = NULL; //the handle to output to edit the cursor
 HDC _GDconsoleDeviceContext = NULL; //get the device contect to draw on
 
@@ -35,6 +41,8 @@ RECT _GDpixelScreenSize = {0}; //user defined pixel screen size
 int _GDwidth = 0, _GDheight = 0;
 
 int _GDpixelWidth = 0, _GDpixelHeight = 0;
+
+
 
 //this is soem messed up stuff about to happen
 typedef BOOL(__stdcall* TransParentBitBlt)(
@@ -65,37 +73,71 @@ int _GDstrLen(const char* string) {
 	return i;
 }
 
+//used by the window to handle incoming messages
+LRESULT CALLBACK _GDwndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    switch (msg) {
+        case WM_DESTROY:
+			_GDwindowOpen = 0;
+            PostQuitMessage(0);
+            return 0;
+        default:
+            return DefWindowProcW(hwnd, msg, wParam, lParam);
+    }
+}
 
-int _GDcreateWindow(){
+//ran in thead so the seperate thread owns the created window and is 
+DWORD WINAPI _GDcreateWindow(LPVOID lpParam){
 	_GDhInstance = GetModuleHandle(NULL);
 	const wchar_t winClassName[] = L"_GDGameWindow";
+	//printf("got hinstance\n");
 	
-	WNDCLASS wc = {};
-	wc.lpfnWndProc = NULL;
+	WNDCLASSW wc = {};
+	wc.lpfnWndProc = _GDwndProc;
 	wc.hInstance = _GDhInstance;
 	wc.lpszClassName = winClassName;
 	wc.style = CS_OWNDC;
 	
-	RegisterClass(&wc);
+	RegisterClassW(&wc);
+	//printf("registered window class\n");
 	
-	_GDconsoleWinHandle = CreateWindowEx(
+	RECT _GDfullWindowSize = {0}; //size of entire window
+	_GDfullWindowSize.left = _GDfullWindowSize.top = 0;
+	_GDfullWindowSize.right = _GDrawWidth;
+	_GDfullWindowSize.bottom = _GDrawHeight;
+	AdjustWindowRectEx(&_GDfullWindowSize,WS_OVERLAPPEDWINDOW,FALSE,0);
+	
+	_GDconsoleWinHandle = CreateWindowExW(
 		0,                              // Optional window styles.
 		winClassName,                     // Window class
 		L"Learn to Program Windows",    // Window text
 		WS_OVERLAPPEDWINDOW,            // Window style
 
 		// Size and position
-		CW_USEDEFAULT, CW_USEDEFAULT, _GDrawWidth, _GDrawHeight,
+		CW_USEDEFAULT, CW_USEDEFAULT, 
+		_GDfullWindowSize.right - _GDfullWindowSize.left, _GDfullWindowSize.bottom - _GDfullWindowSize.top,
 
 		NULL,       // Parent window    
 		NULL,       // Menu
 		_GDhInstance,  // Instance handle
 		NULL        // Additional application data
 		);
-
+	//printf("created window\n");
+	
 	ShowWindow(_GDconsoleWinHandle, SW_SHOW);
 	_GDconsoleDeviceContext = GetDC(_GDconsoleWinHandle); //get console device contect handle (for drawing)
-
+	//printf("window showed\n");
+	
+	SetEvent(_GDwindowReadyEvent);
+	_GDwindowOpen = 1;
+	//message loop for the newly created window
+	MSG msg = { };
+	while (GetMessage(&msg, NULL, 0, 0) > 0)
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	
+	return 0;
 }
 
 
@@ -103,7 +145,7 @@ int _GDcreateWindow(){
 returns false(0) if successfull, return true(1) if fails
 title needs to be less than 63998 to be less than 64000 characters long and accomodate for terminating('\0') value
 */
-int GDinit(int width, int height, int pixelWidth, int pixelHeight, char* title) {
+int GDinit(int width, int height, int pixelWidth, int pixelHeight, wchar_t* title) {
 
 	//saves the width and height aswell as raw pixel width and height for later use
 	_GDwidth = width;
@@ -121,18 +163,24 @@ int GDinit(int width, int height, int pixelWidth, int pixelHeight, char* title) 
 
 	_GDpixelWidth = pixelWidth;
 	_GDpixelHeight = pixelHeight;
-
+	//printf("setup passed dimenstions\n");
+	
 	//create dediceated window for graphics
-	_GDhInstance = GetModuleHandle(NULL);
 	
 	//create extra buffer for displaying and tings
-	_GDcreateWindow();
+	_GDwindowReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	_GDwindowThread = CreateThread(NULL, 0, _GDcreateWindow, NULL, 0, &_GDwindowThreadId);
+	WaitForSingleObject(_GDwindowReadyEvent, INFINITE);
+	CloseHandle(_GDwindowReadyEvent);
 	
+	//_GDcreateWindow();
+	//printf("created window\n");
 	
 	//creates double buffer (need to delete these as i created them, they're not from the console it self )
 	_GDbackBufferDeviceContext = CreateCompatibleDC(_GDconsoleDeviceContext);
 	_GDbackBufferBitMap = CreateCompatibleBitmap(_GDconsoleDeviceContext, _GDrawWidth, _GDrawHeight);
 	SelectObject(_GDbackBufferDeviceContext, _GDbackBufferBitMap); //links the bitmap to the dc to draw on it
+	//printf("setup back buffer\n");
 
 	//lock widnow from drawing ----------- test
 
@@ -145,47 +193,17 @@ int GDinit(int width, int height, int pixelWidth, int pixelHeight, char* title) 
 	//loading important dll :)
 	__SMimg32DLL = LoadLibraryA("./msimg32.dll");
 	TransParentBlt = (TransParentBitBlt)GetProcAddress(__SMimg32DLL, "TransparentBlt");
+	//printf("got blt compatibility and loaded libaries\n");
 
 	return 0;
 }
 
 /*
-* note -- says some errors about buffer over runs and address null but should never happen
-returns false(0) if successfull, return true(1) if fails
-changes the title to the given string or to "GDIEngine-Tile" by defalut
-title needs to be less than 63998 to be less than 64000 characters long and accomodate for terminating('\0') value
+max title length is 255 character exculiding the termination char
+supports 
 */
-int GDsetTitle(const char* title) {
-	int replace = 0;
-	char replacementText[] = "Error Occured while setting title (eather too small or big)";
-	char* origTitle = title;
-	int titleLen = 0;
-
-	//error checking	
-	if (title == NULL) {
-		replace = 1; 
-		title = replacementText; 
-	}
-	titleLen = _GDstrLen(title);
-	if (titleLen <= 0 || titleLen >= 63998) {
-		replace = 1;
-		title = replacementText;
-		titleLen = _GDstrLen(title);
-	}
-
-	WCHAR* titleTextPointer = (WCHAR*)malloc(sizeof(WCHAR) * (titleLen + 1)); //creates a new wide char list(WCHAR array) +1 for a terminating character(\0)
-	if (titleTextPointer == NULL) { printf("error occured while locating space\n"); return 1; }
-	for (int i = 0; i < titleLen; i++) {//iterats through lists and transfers memory
-		titleTextPointer[i] = title[i]; //actual transfer (char is 1byte, wide char is 2 bytes)
-	}
-	titleTextPointer[titleLen] = '\0'; //adds the last terminating value to properly use the widechar in function
-	SetConsoleTitle((LPCWSTR)titleTextPointer); //converts the WCHAR* to LPCWSTR=(long pointer constant wide string)
-	free(titleTextPointer); //deletes dynamically allocated array
-
-	if (replace) {
-		title = origTitle;
-	}
-	return 0;
+inline int GDsetTitle(wchar_t* title) {
+	return SetWindowTextW(_GDconsoleWinHandle, title);
 }
 
 /*
@@ -197,7 +215,7 @@ int GDdrawRawPixel(int x, int y, COLORREF colour) {
 		!_GDpixelSetType ? SetPixelV(_GDbackBufferDeviceContext, x, y, colour) : SetPixel(_GDbackBufferDeviceContext, x, y, colour);
 	}
 	else {
-		printf("Out Of Range Pixel Draw!\n");
+		//printf("Out Of Range Pixel Draw!\n");
 		return 1;
 	}
 	return 0;
@@ -214,7 +232,7 @@ int GDdrawPixel(int x, int y, COLORREF colour) {
 		DeleteObject(_GDmasterBrush);
 	}
 	else {
-		printf("Out Of Range Pixel Draw!\n");
+		//printf("Out Of Range Pixel Draw!\n");
 		return 1;
 	}
 	return 0;
@@ -240,20 +258,26 @@ returns false(0) if successfull, return true(1) if fails
 */
 int GDdrawBackBuffer() {
 	LockWindowUpdate(NULL);
-	if (BitBlt(_GDconsoleDeviceContext, 0 + 8, 0 + 31, _GDrawWidth, _GDrawHeight, _GDbackBufferDeviceContext, 0, 0, SRCCOPY)) {
+	if (BitBlt(_GDconsoleDeviceContext, 0, 0, _GDrawWidth, _GDrawHeight, _GDbackBufferDeviceContext, 0, 0, SRCCOPY)) {
 		return 0;
 	}
 	else {
-		printf("Back Buffer Blit failed\n");
+		//printf("Back Buffer Blit failed\n");
 		return 1;
 	}
 	LockWindowUpdate(_GDconsoleWinHandle);
 }
 
 int GDdeInit() {
+	SendMessage(_GDconsoleWinHandle, WM_QUIT, 0, 0);
+	WaitForSingleObject(_GDwindowThread, INFINITE);
+    CloseHandle(_GDwindowThread);
+	//printf("closed thread");
+	
 	DeleteObject(_GDbackBufferBitMap);
 	DeleteDC(_GDbackBufferDeviceContext);
 	ReleaseDC(_GDconsoleWinHandle, _GDconsoleDeviceContext);
 	FreeLibrary(__SMimg32DLL);
+	//printf("freed extra resources");
 	return 0;
 }
