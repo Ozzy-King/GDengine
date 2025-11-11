@@ -12,9 +12,10 @@ a hello world program which consists of random points being plotted on the windo
 - Unicode supported window title
 ### Sprite
 - load images of different formats
+
 |IMAGE TYPE|BMP|GIF|ICO|JPEG|PNG|TIFF|
-|-|-|-|-|-|-|-|
-|SUPPORTED|✅|✅|✅|✅|✅|✅|
+| -------- | - | - | - | -- | - | -- |
+|SUPPORTED |✅ |✅|✅ |✅ |✅ |✅ |
 - basic tile based image loading
 - draw loaded images to buffer quickly
 
